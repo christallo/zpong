@@ -50,5 +50,5 @@ fn draw(self: *Ball) -> void:
     cast(i32)self.*.pos.y - 5,
     10,
     10,
-    get_white()
+    get_yellow()
   )
