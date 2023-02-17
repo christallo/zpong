@@ -1,0 +1,98 @@
+from 'System.String'                  import [ String ]
+from 'System.Io'                      import [ printf ]
+from 'Dependencies/RayLib/RayLib.zpp' import *
+
+type Game = (
+  player1: Pad,
+  player2: Pad,
+  width: u32,
+  height: u32
+)
+
+-- todo: move this and related functions to `Pad.zpp`
+type InputScheme = (up_button: KeyboardKey, down_button: KeyboardKey)
+type Pad = (
+  scheme: InputScheme,
+  score: u32,
+  speed: f32,
+  pos: Vec2,
+  size: Vec2
+)
+
+fn create() -> Game:
+  width: f32 = cast(f32)get_screen_width()
+  height: f32 = cast(f32)get_screen_height()
+  pad_size: Vec2 = (x: 10, y: 100)
+  speed: f32 = 220
+
+  return (
+    player1: (
+      scheme: (up_button: KeyW, down_button: KeyS),
+      score: 0,
+      speed: speed,
+      pos: (x: 20, y: height / 2),
+      size: pad_size
+    ),
+    player2: (
+      scheme: (up_button: KeyUp, down_button: KeyDown),
+      score: 0,
+      speed: speed,
+      pos: (x: width - 20 - pad_size.x, y: height / 2),
+      size: pad_size
+    ),
+    width: cast(u32)width,
+    height: cast(u32)height
+  )
+
+fn run(self: *mut Game) -> void:
+  while not window_should_close():
+    self.update()
+
+    begin_drawing()
+    clear_background(get_white())
+    self.draw()
+    end_drawing()
+
+fn draw(self: *mut Game) -> void:
+  self.*.player1.mut.draw_pad()
+  self.*.player2.mut.draw_pad()
+
+fn update(self: *mut Game) -> void:
+  if is_debug_build!():
+    draw_fps(0, 0)
+
+  self.*.player1.mut.update_pad(self.*.height)
+  self.*.player2.mut.update_pad(self.*.height)
+  -- draw_line(200, 2, 300, 100, get_lightgray())
+
+fn update_pad(self: *mut Pad, height: u32) -> void:
+  if is_key_down(self.*.scheme.up_button):
+    self.move_pad_up()
+
+  if is_key_down(self.*.scheme.down_button):
+    self.move_pad_down(cast(f32)height)
+
+fn move_pad_up(self: *mut Pad) -> void:
+  self.*.pos.y -= get_frame_time() * self.*.speed
+  
+  if self.*.pos.y - self.*.size.y / 2 < 0:
+    self.*.pos.y = self.*.size.y / 2
+
+fn move_pad_down(self: *mut Pad, height: f32) -> void:
+  self.*.pos.y += get_frame_time() * self.*.speed
+    
+  if self.*.pos.y + self.*.size.y / 2 > height:
+    self.*.pos.y = height - self.*.size.y / 2
+
+fn draw_pad(self: *mut Pad) -> void:
+  draw_rectangle_v(
+    (
+      x: self.*.pos.x,
+      y: self.*.pos.y - self.*.size.y / 2
+    ),
+    (
+      x: self.*.size.x,
+      y: self.*.size.y
+    ),
+    get_black()
+  )

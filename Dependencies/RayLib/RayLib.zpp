@@ -1,0 +1,102 @@
+type Color = (r: u8, g: u8, b: u8, a: u8)
+type Vec2 = (x: f32, y: f32)
+type KeyboardKey = i32
+
+KeyS:    KeyboardKey =  83
+KeyW:    KeyboardKey =  87
+KeyDown: KeyboardKey = 264
+KeyUp:   KeyboardKey = 265
+
+fn get_black() -> Color:
+  return (r: 0, g: 0, b: 0, a: 255)
+
+fn get_white() -> Color:
+  return (r: 255, g: 255, b: 255, a: 255)
+
+fn get_lightgray() -> Color:
+  return (r: 200, g: 200, b: 200, a: 255)
+
+fn init_window(width: i32, height: i32, title: *u8) -> void:
+  extern_call!(|void| 'lib/libraylib.a', 'InitWindow', width, height, title)
+
+fn close_window() -> void:
+  extern_call!(|void| 'lib/libraylib.a', 'CloseWindow')
+
+fn window_should_close() -> u8:
+  return extern_call!(|u8| 'lib/libraylib.a', 'WindowShouldClose')
+
+fn begin_drawing() -> void:
+  extern_call!(|void| 'lib/libraylib.a', 'BeginDrawing')
+
+fn clear_background(color: Color) -> void:
+  extern_call!(|void| 'lib/libraylib.a', 'ClearBackground', color.into!(|i32|))
+
+fn end_drawing() -> void:
+  extern_call!(|void| 'lib/libraylib.a', 'EndDrawing')
+
+fn set_target_fps(fps: i32) -> void:
+  extern_call!(|void| 'lib/libraylib.a', 'SetTargetFPS', fps)
+
+fn get_fps() -> i32:
+  return extern_call!(|i32| 'lib/libraylib.a', 'GetFPS')
+
+fn draw_fps(x: i32, y: i32) -> void:
+  extern_call!(|void| 'lib/libraylib.a', 'DrawFPS', x, y)
+
+fn toggle_fullscreen() -> void:
+  extern_call!(|void| 'lib/libraylib.a', 'ToggleFullscreen')
+
+fn draw_text(text: *u8, x: i32, y: i32, font_size: i32, color: Color) -> void:
+  extern_call!(|void| 'lib/libraylib.a', 'DrawText', text, x, y, font_size, color.into!(|i32|))
+
+fn draw_line_ex(start: Vec2, stop: Vec2, thick: f32, color: Color) -> void:
+  extern_call!(|void|
+    'lib/libraylib.a',
+    'DrawLineEx',
+    start.into!(|<2 x f32>|),
+    stop.into!(|<2 x f32>|),
+    thick,
+    color.into!(|i32|)
+  )
+
+fn draw_line(start_x: i32, start_y: i32, stop_x: i32, stop_y: i32, color: Color) -> void:
+  extern_call!(|void| 'lib/libraylib.a', 'DrawLine', start_x, start_y, stop_x, stop_y, color.into!(|i32|))
+
+fn get_screen_width() -> i32:
+  return extern_call!(|i32| 'lib/libraylib.a', 'GetScreenWidth')
+
+fn get_screen_height() -> i32:
+  return extern_call!(|i32| 'lib/libraylib.a', 'GetScreenHeight')
+
+fn get_render_width() -> i32:
+  return extern_call!(|i32| 'lib/libraylib.a', 'GetRenderWidth')
+
+fn get_render_height() -> i32:
+  return extern_call!(|i32| 'lib/libraylib.a', 'GetRenderHeight')
+
+fn get_monitor_width(monitor: i32) -> i32:
+  return extern_call!(|i32| 'lib/libraylib.a', 'GetMonitorWidth', monitor)
+
+fn get_monitor_height(monitor: i32) -> i32:
+  return extern_call!(|i32| 'lib/libraylib.a', 'GetMonitorHeight', monitor)
+
+fn get_current_monitor() -> i32:
+  return extern_call!(|i32| 'lib/libraylib.a', 'GetCurrentMonitor')
+
+fn is_key_down(key: KeyboardKey) -> u8:
+  return extern_call!(|u8| 'lib/libraylib.a', 'IsKeyDown', key)
+
+fn draw_rectangle_v(pos: Vec2, size: Vec2, color: Color) -> void:
+  extern_call!(|void|
+    'lib/libraylib.a',
+    'DrawRectangleV',
+    pos.into!(|<2 x f32>|),
+    size.into!(|<2 x f32>|),
+    color.into!(|i32|)
+  )
+  
+fn measure_text(text: *u8, font_size: i32) -> i32:
+  return extern_call!(|i32| 'lib/libraylib.a', 'MeasureText', text, font_size)
+
+fn get_frame_time() -> f32:
+  return extern_call!(|f32| 'lib/libraylib.a', 'GetFrameTime')

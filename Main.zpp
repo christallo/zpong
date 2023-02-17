@@ -1,0 +1,24 @@
+from 'Dependencies/RayLib/RayLib.zpp' import [
+  init_window,
+  close_window,
+  toggle_fullscreen
+]
+
+from 'PongGame.zpp'                   import [
+  Game -> PongGame,
+  create -> create_pong_game,
+  run
+]
+
+fn main(argc: u32, argv: **u8) -> Result:
+  init_window(0, 0, cstr!('PongGame'))
+  
+  -- set_target_fps(1000)
+  toggle_fullscreen()
+
+  pong: PongGame = create_pong_game()
+  pong.mut.run()
+
+  close_window()
+
+  return .Ok

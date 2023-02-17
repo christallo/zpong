@@ -1,0 +1,2 @@
+clear
+eval "$ZPP_PATH run Main.zpp --clang '-lm' $@"
