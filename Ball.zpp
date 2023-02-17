@@ -20,7 +20,7 @@ fn get_initial_ball_vel() -> Vec2:
   x_direction: f32 = direction_table[get_random_value(0, 1)]
   y_direction: f32 = direction_table[get_random_value(0, 1)]
 
-  return (x: x_direction * 300, y: y_direction * 100)
+  return (x: x_direction * 400, y: y_direction * 150)
 
 fn update(self: *mut Ball) -> void:
   self.*.pos.x += get_frame_time() * self.*.vel.x
