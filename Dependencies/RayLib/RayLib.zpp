@@ -112,3 +112,11 @@ fn get_frame_time() -> f32:
 
 fn get_random_value(min: i32, max: i32) -> i32:
   return extern_call!(|i32| 'lib/libraylib.a', 'GetRandomValue', min, max)
+
+fn get_monitor_refresh_rate(monitor: i32) -> i32:
+  return extern_call!(|i32| 'lib/libraylib.a', 'GetMonitorRefreshRate', monitor)
+
+fn set_target_fps_to_max() -> void:
+  set_target_fps(
+    get_monitor_refresh_rate(get_current_monitor())
+  )

@@ -1,0 +1,54 @@
+from 'Dependencies/RayLib/RayLib.zpp' import *
+from 'Pad.zpp'                        import [ Pad ]
+
+type Ball = (
+  pos: Vec2,
+  vel: Vec2
+)
+
+fn create_centered(width: f32, height: f32) -> Ball:
+  return (
+    pos: (x: width / 2, y: height / 2),
+    vel: get_initial_ball_vel()
+  )
+
+fn drop(self: *mut Ball) -> void:
+  pass
+
+fn get_initial_ball_vel() -> Vec2:
+  direction_table: [2 x f32] = [-1, 1]
+  x_direction: f32 = direction_table[get_random_value(0, 1)]
+  y_direction: f32 = direction_table[get_random_value(0, 1)]
+
+  return (x: x_direction * 300, y: y_direction * 100)
+
+fn update(self: *mut Ball) -> void:
+  self.*.pos.x += get_frame_time() * self.*.vel.x
+  self.*.pos.y += get_frame_time() * self.*.vel.y
+
+fn is_ball_colliding_with_pad(self: *Ball, pad: *Pad) -> u8:
+  return (
+    self.is_ball_colliding_with_pad_on_x(pad) and
+    self.is_ball_colliding_with_pad_on_y(pad)
+  )
+
+fn is_ball_colliding_with_pad_on_x(self: *Ball, pad: *Pad) -> u8:
+  return (
+    self.*.pos.x >= pad.*.pos.x and
+    self.*.pos.x <= pad.*.pos.x + pad.*.size.x
+  )
+
+fn is_ball_colliding_with_pad_on_y(self: *Ball, pad: *Pad) -> u8:
+  return (
+    self.*.pos.y >= pad.*.pos.y - pad.*.size.y / 2 and
+    self.*.pos.y <= pad.*.pos.y + pad.*.size.y / 2
+  )
+
+fn draw(self: *Ball) -> void:
+  draw_rectangle(
+    cast(i32)self.*.pos.x - 5,
+    cast(i32)self.*.pos.y - 5,
+    10,
+    10,
+    get_white()
+  )

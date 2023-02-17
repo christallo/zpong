@@ -1,0 +1,63 @@
+from 'Dependencies/RayLib/RayLib.zpp' import *
+from 'System.String'                  import [ String ]
+
+type InputScheme = (up_button: KeyboardKey, down_button: KeyboardKey)
+type Pad = (
+  scheme: InputScheme,
+  username: String,
+  score: u32,
+  speed: f32,
+  pos: Vec2,
+  size: Vec2
+)
+
+fn create(scheme: InputScheme, username: String, speed: f32, pos: Vec2, size: Vec2) -> Pad:
+  return (
+    scheme: scheme,
+    username: username,
+    score: 0,
+    speed: speed,
+    pos: pos,
+    size: size
+  )
+
+fn drop(self: *mut Pad) -> void:
+  pass
+
+fn update(self: *mut Pad, height: f32) -> void:
+  if is_key_down(self.*.scheme.up_button):
+    self.move_pad_up()
+
+  if is_key_down(self.*.scheme.down_button):
+    self.move_pad_down(height)
+
+fn move_pad_up(self: *mut Pad) -> void:
+  self.*.pos.y -= get_frame_time() * self.*.speed
+  
+  if self.is_pad_colliding_with_top():
+    self.*.pos.y = self.*.size.y / 2
+
+fn is_pad_colliding_with_top(self: *Pad) -> u8:
+  return self.*.pos.y - self.*.size.y / 2 < 0
+
+fn move_pad_down(self: *mut Pad, height: f32) -> void:
+  self.*.pos.y += get_frame_time() * self.*.speed
+    
+  if self.is_pad_colliding_with_bottom(height):
+    self.*.pos.y = height - self.*.size.y / 2
+
+fn is_pad_colliding_with_bottom(self: *Pad, height: f32) -> u8:
+  return self.*.pos.y + self.*.size.y / 2 > height
+
+fn draw(self: *Pad) -> void:
+  draw_rectangle_v(
+    (
+      x: self.*.pos.x,
+      y: self.*.pos.y - self.*.size.y / 2
+    ),
+    (
+      x: self.*.size.x,
+      y: self.*.size.y
+    ),
+    get_white()
+  )

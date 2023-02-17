@@ -1,32 +1,49 @@
 from 'Dependencies/RayLib/RayLib.zpp' import [
   init_window,
   close_window,
-  toggle_fullscreen
+  toggle_fullscreen,
+  set_target_fps_to_max
 ]
 
-from 'PongGame.zpp' import [
+from 'Game.zpp' import [
   Game -> PongGame,
   create -> create_pong_game,
+  drop -> drop_pong_game,
   run
 ]
 
-from 'System.String' import [ String ]
+from 'System.String' import [ String, drop -> drop_string ]
 from 'System.Io'     import [ input ]
 from 'System.Array'  import [ eq ]
 
+fn input_option(prompt: String, option: *mut u8) -> Result:
+  try input(prompt, out unparsed_option: String)
+  defer unparsed_option.mut.drop_string()
+
+  *option = unparsed_option.ref.eq(ref 'y')
+  return .Ok
+
 fn main(argc: u32, argv: **u8) -> Result:
+  clang_flags!('-lm')
+
   try input('Player1 Username: ', out player1username: String)
   try input('Player2 Username: ', out player2username: String)
-  try input('Log FPS [y/n]: ', out log_fps_input: String)
+  try input_option('Log FPS [y/n]: ', out log_fps: u8)
+  try input_option('Lock FPS [y/n]: ', out lock_fps: u8)
 
-  log_fps: u8 = log_fps_input.ref.eq(ref 'y')
+  defer player1username.mut.drop_string()
+  defer player2username.mut.drop_string()
 
   init_window(0, 0, cstr!('PongGame'))
   toggle_fullscreen()
 
+  if lock_fps:
+    set_target_fps_to_max()
+
   pong: PongGame = create_pong_game(player1username, player2username, log_fps)
+  defer pong.mut.drop_pong_game()
+
   pong.mut.run()
 
   close_window()
-
   return .Ok
