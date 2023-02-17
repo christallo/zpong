@@ -94,9 +94,21 @@ fn draw_rectangle_v(pos: Vec2, size: Vec2, color: Color) -> void:
     size.into!(|<2 x f32>|),
     color.into!(|i32|)
   )
+
+fn draw_rectangle(x: i32, y: i32, width: i32, height: i32, color: Color) -> void:
+  extern_call!(|void|
+    'lib/libraylib.a',
+    'DrawRectangle',
+    x, y,
+    width, height,
+    color.into!(|i32|)
+  )
   
 fn measure_text(text: *u8, font_size: i32) -> i32:
   return extern_call!(|i32| 'lib/libraylib.a', 'MeasureText', text, font_size)
 
 fn get_frame_time() -> f32:
   return extern_call!(|f32| 'lib/libraylib.a', 'GetFrameTime')
+
+fn get_random_value(min: i32, max: i32) -> i32:
+  return extern_call!(|i32| 'lib/libraylib.a', 'GetRandomValue', min, max)

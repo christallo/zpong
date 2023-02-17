@@ -4,19 +4,27 @@ from 'Dependencies/RayLib/RayLib.zpp' import [
   toggle_fullscreen
 ]
 
-from 'PongGame.zpp'                   import [
+from 'PongGame.zpp' import [
   Game -> PongGame,
   create -> create_pong_game,
   run
 ]
 
+from 'System.String' import [ String ]
+from 'System.Io'     import [ input ]
+from 'System.Array'  import [ eq ]
+
 fn main(argc: u32, argv: **u8) -> Result:
+  try input('Player1 Username: ', out player1username: String)
+  try input('Player2 Username: ', out player2username: String)
+  try input('Log FPS [y/n]: ', out log_fps_input: String)
+
+  log_fps: u8 = log_fps_input.ref.eq(ref 'y')
+
   init_window(0, 0, cstr!('PongGame'))
-  
-  -- set_target_fps(1000)
   toggle_fullscreen()
 
-  pong: PongGame = create_pong_game()
+  pong: PongGame = create_pong_game(player1username, player2username, log_fps)
   pong.mut.run()
 
   close_window()

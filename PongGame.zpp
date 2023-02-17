@@ -1,33 +1,43 @@
-from 'System.String'                  import [ String ]
-from 'System.Io'                      import [ printf ]
 from 'Dependencies/RayLib/RayLib.zpp' import *
+from 'System.String'                  import [ String ]
+from 'System.Format'                  import [ format ]
+from 'System.Math'                    import [ max ]
 
 type Game = (
   player1: Pad,
   player2: Pad,
-  width: u32,
-  height: u32
+  ball: Ball,
+  width: f32,
+  height: f32,
+  log_fps: u8
 )
 
 -- todo: move this and related functions to `Pad.zpp`
 type InputScheme = (up_button: KeyboardKey, down_button: KeyboardKey)
 type Pad = (
   scheme: InputScheme,
+  username: String,
   score: u32,
   speed: f32,
   pos: Vec2,
   size: Vec2
 )
 
-fn create() -> Game:
+type Ball = (
+  pos: Vec2,
+  vel: Vec2
+)
+
+fn create(player1username: String, player2username: String, log_fps: u8) -> Game:
   width: f32 = cast(f32)get_screen_width()
   height: f32 = cast(f32)get_screen_height()
   pad_size: Vec2 = (x: 10, y: 100)
-  speed: f32 = 220
+  speed: f32 = 350
 
   return (
     player1: (
       scheme: (up_button: KeyW, down_button: KeyS),
+      username: player1username,
       score: 0,
       speed: speed,
       pos: (x: 20, y: height / 2),
@@ -35,13 +45,16 @@ fn create() -> Game:
     ),
     player2: (
       scheme: (up_button: KeyUp, down_button: KeyDown),
+      username: player2username,
       score: 0,
       speed: speed,
       pos: (x: width - 20 - pad_size.x, y: height / 2),
       size: pad_size
     ),
-    width: cast(u32)width,
-    height: cast(u32)height
+    ball: (pos: (x: width / 2, y: height / 2), vel: get_initial_ball_vel()),
+    width: width,
+    height: height,
+    log_fps: log_fps
   )
 
 fn run(self: *mut Game) -> void:
@@ -54,23 +67,73 @@ fn run(self: *mut Game) -> void:
     end_drawing()
 
 fn draw(self: *mut Game) -> void:
-  self.*.player1.mut.draw_pad()
-  self.*.player2.mut.draw_pad()
+  self.*.player1.ref.draw_pad()
+  self.*.player2.ref.draw_pad()
+
+  self.draw_score()
+  self.*.ball.ref.draw_ball()
+
+fn draw_score(self: *mut Game) -> void:
+  font_size: i32 = 40
+
+  txt1: *u8 = format('{s}: {u32}\0', args!(self.*.player1.username, self.*.player1.score)).ptr
+  txt2: *u8 = format('{s}: {u32}\0', args!(self.*.player2.username, self.*.player2.score)).ptr
+  bigger_txt_measure: f32 = max(cast(f32)measure_text(txt1, font_size), cast(f32)measure_text(txt2, font_size))
+
+  x1: f32 = self.*.width / 2 - bigger_txt_measure / 2
+  y1: f32 = self.*.height / 2 - 40
+  draw_text(txt1, cast(i32)x1, cast(i32)y1, font_size, get_lightgray())
+
+  x2: f32 = self.*.width / 2 - bigger_txt_measure / 2
+  y2: f32 = self.*.height / 2 + 10
+  draw_text(txt2, cast(i32)x2, cast(i32)y2, font_size, get_lightgray())
 
 fn update(self: *mut Game) -> void:
-  if is_debug_build!():
+  if self.*.log_fps:
     draw_fps(0, 0)
 
   self.*.player1.mut.update_pad(self.*.height)
   self.*.player2.mut.update_pad(self.*.height)
-  -- draw_line(200, 2, 300, 100, get_lightgray())
 
-fn update_pad(self: *mut Pad, height: u32) -> void:
+  self.*.ball.mut.update_ball()
+  self.handle_ball_collisions()
+
+fn get_initial_ball_vel() -> Vec2:
+  x_direction: f32 = -1 if get_random_value(0, 1) else 1
+  y_direction: f32 = -1 if get_random_value(0, 1) else 1
+
+  return (x: x_direction * 300, y: y_direction * 100)
+
+fn handle_ball_collisions(self: *mut Game) -> void:
+  if (
+    self.*.ball.ref.is_ball_colliding_with_pad(ref self.*.player1) or
+    self.*.ball.ref.is_ball_colliding_with_pad(ref self.*.player2)
+  ):
+    self.*.ball.vel.x *= -1
+
+  if self.*.ball.pos.y > self.*.height or self.*.ball.pos.y < 0:
+    self.*.ball.vel.y *= -1
+
+  if self.*.ball.pos.x > self.*.width:
+    self.*.player1.score += 1
+    self.*.ball.pos = (x: self.*.width / 2, y: self.*.height / 2)
+    self.*.ball.vel = get_initial_ball_vel()
+
+  if self.*.ball.pos.x < 0:
+    self.*.player2.score += 1
+    self.*.ball.pos = (x: self.*.width / 2, y: self.*.height / 2)
+    self.*.ball.vel = get_initial_ball_vel()
+
+fn update_ball(self: *mut Ball) -> void:
+  self.*.pos.x += get_frame_time() * self.*.vel.x
+  self.*.pos.y += get_frame_time() * self.*.vel.y
+
+fn update_pad(self: *mut Pad, height: f32) -> void:
   if is_key_down(self.*.scheme.up_button):
     self.move_pad_up()
 
   if is_key_down(self.*.scheme.down_button):
-    self.move_pad_down(cast(f32)height)
+    self.move_pad_down(height)
 
 fn move_pad_up(self: *mut Pad) -> void:
   self.*.pos.y -= get_frame_time() * self.*.speed
@@ -84,7 +147,29 @@ fn move_pad_down(self: *mut Pad, height: f32) -> void:
   if self.*.pos.y + self.*.size.y / 2 > height:
     self.*.pos.y = height - self.*.size.y / 2
 
-fn draw_pad(self: *mut Pad) -> void:
+fn is_ball_colliding_with_pad(self: *Ball, pad: *Pad) -> u8:
+  if (
+    self.*.pos.x >= pad.*.pos.x and
+    self.*.pos.x <= pad.*.pos.x + pad.*.size.x
+  ):
+    if (
+      self.*.pos.y >= pad.*.pos.y - (pad.*.size.y / 2) and
+      self.*.pos.y <= pad.*.pos.y + (pad.*.size.y / 2)
+    ):
+      return True
+  
+  return False
+
+fn draw_ball(self: *Ball) -> void:
+  draw_rectangle(
+    cast(i32)self.*.pos.x - 5,
+    cast(i32)self.*.pos.y - 5,
+    10,
+    10,
+    get_black()
+  )
+
+fn draw_pad(self: *Pad) -> void:
   draw_rectangle_v(
     (
       x: self.*.pos.x,
