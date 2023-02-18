@@ -7,6 +7,8 @@ from 'Dependencies/RayLib/RayLib.zpp' import [
 
 from 'Game.zpp' import [
   Game -> PongGame,
+  DifficultyLevel,
+  DifficultyEasy, DifficultyMedium, DifficultyHard,
   create -> create_pong_game,
   drop -> drop_pong_game,
   run
@@ -23,17 +25,32 @@ fn input_option(prompt: String, option: *mut u8) -> Result:
   *option = unparsed_option.ref.eq(ref 'y')
   return .Ok
 
+fn parse_difficulty(unparsed_difficulty: *String) -> DifficultyLevel:
+  if unparsed_difficulty.eq(ref 'easy'):
+    return DifficultyEasy
+  
+  if unparsed_difficulty.eq(ref 'hard'):
+    return DifficultyHard
+  
+  return DifficultyMedium
+
+-- * Entry point for the pong game
+-- * The game logic is taken from 'https://thatonegamedev.com/cpp/prgramming-a-pong-game-in-ansi-c/'
 fn main(argc: u32, argv: **u8) -> Result:
   clang_flags!('-lm')
 
   try input('Player1 Username: ', out player1username: String)
   try input('Player2 Username: ', out player2username: String)
-  try input_option('Log FPS [y/n]: ', out log_fps: u8)
-  try input_option('Lock FPS [y/n]: ', out lock_fps: u8)
-  try input_option('Cornice [y/n]: ', out cornice: u8)
+  try input('Difficulty Level [easy, default(medium), hard]: ', out unparsed_difficulty: String)
+  try input_option('Log FPS [y, default(n)]: ', out log_fps: u8)
+  try input_option('Lock FPS [y, default(n)]: ', out lock_fps: u8)
+  try input_option('Cornice [y, default(n)]: ', out cornice: u8)
 
   defer player1username.mut.drop_string()
   defer player2username.mut.drop_string()
+  defer unparsed_difficulty.mut.drop_string()
+
+  difficulty: DifficultyLevel = unparsed_difficulty.ref.parse_difficulty()
 
   init_window(0, 0, cstr!('PongGame'))
   toggle_fullscreen()
@@ -44,6 +61,7 @@ fn main(argc: u32, argv: **u8) -> Result:
   pong: PongGame = create_pong_game(
     player1username,
     player2username,
+    difficulty,
     log_fps,
     cornice
   )

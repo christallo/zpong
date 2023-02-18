@@ -1,7 +1,5 @@
 from 'Dependencies/RayLib/RayLib.zpp' import *
 from 'System.String'                  import [ String ]
-from 'System.Format'                  import [ format ]
-from 'System.Math'                    import [ max ]
 
 from 'Pad.zpp' import [
   Pad,
@@ -18,8 +16,18 @@ from 'Ball.zpp' import [
   update -> update_ball,
   draw -> draw_ball,
   is_ball_colliding_with_pad,
-  get_initial_ball_vel
+  get_initial_ball_vel,
+  reset_ball
 ]
+
+from 'Ui.zpp' import *
+
+-- indicates the speed of the ball
+type DifficultyLevel = u8
+
+DifficultyEasy:   DifficultyLevel = 0
+DifficultyMedium: DifficultyLevel = 1
+DifficultyHard:   DifficultyLevel = 2
 
 type Game = (
   player1: Pad,
@@ -27,6 +35,9 @@ type Game = (
   ball: Ball,
   width: f32,
   height: f32,
+  difficulty: DifficultyLevel,
+  is_paused: u8,
+  is_help: u8,
   log_fps: u8,
   cornice: u8
 )
@@ -34,6 +45,7 @@ type Game = (
 fn create(
   player1username: String,
   player2username: String,
+  difficulty: DifficultyLevel,
   log_fps: u8,
   cornice: u8
 ) -> Game:
@@ -57,9 +69,12 @@ fn create(
       (x: width - 20 - pad_size.x, y: height / 2),
       pad_size
     ),
-    ball: create_centered_ball(width, height),
+    ball: create_centered_ball(width, height, difficulty),
     width: width,
     height: height,
+    difficulty: difficulty,
+    is_paused: False,
+    is_help: False,
     log_fps: log_fps,
     cornice: cornice
   )
@@ -72,20 +87,23 @@ fn drop(self: *mut Game) -> void:
 fn run(self: *mut Game) -> void:
   while not window_should_close():
     self.update()
+    self.pre_draw()
 
-    begin_drawing()
-    clear_background(get_black())
-    self.draw()
-    end_drawing()
+fn pre_draw(self: *Game) -> void:
+  begin_drawing()
+  clear_background(get_black())
+  self.draw()
+  end_drawing()
 
 fn draw(self: *Game) -> void:
   self.*.player1.ref.draw_pad()
   self.*.player2.ref.draw_pad()
 
-  -- drawing the score before the ball
+  -- drawing the sub ui before the ball
   -- allows the ball to graphically overwrite
   -- the text when passing over it
-  self.draw_score()
+  -- this creates a cool effect
+  self.draw_sub_ui()
   self.*.ball.ref.draw_ball()
 
   -- drawing the ui after all because
@@ -93,77 +111,33 @@ fn draw(self: *Game) -> void:
   -- everything else
   self.draw_ui()
 
-fn draw_ui(self: *Game) -> void:
-  if self.*.cornice:
-    self.draw_cornice()
-
-  if self.*.log_fps:
-    draw_fps(0, 0)
-
-fn draw_cornice(self: *Game) -> void:
-  w: f32 = self.*.width - 1
-  h: f32 = self.*.height - 1
-
-  thick: f32 = 5
-  color: Color = get_lightgray()
-
-  -- drawing the top cornice
-  draw_line_ex(
-    (x: 1, y: 1),
-    (x: w, y: 1),
-    thick,
-    color
-  )
-  -- drawing the left cornice
-  draw_line_ex(
-    (x: 1, y: 1),
-    (x: 1, y: h),
-    thick,
-    color
-  )
-  -- drawing the bottom cornice
-  draw_line_ex(
-    (x: 1, y: h),
-    (x: w, y: h),
-    thick,
-    color
-  )
-  -- drawing the right cornice
-  draw_line_ex(
-    (x: w, y: 1),
-    (x: w, y: h),
-    thick,
-    color
-  )
-
-fn draw_score(self: *Game) -> void:
-  font_size: i32 = 40
-
-  -- building the text score for player 1 and 2
-  txt1: *u8 = format('{s}: {u32}\0', args!(self.*.player1.username, self.*.player1.score)).ptr
-  txt2: *u8 = format('{s}: {u32}\0', args!(self.*.player2.username, self.*.player2.score)).ptr
-  -- this is useful to left-align the messages and avoid center-aligned texts
-  bigger_txt_measure: f32 = max(cast(f32)measure_text(txt1, font_size), cast(f32)measure_text(txt2, font_size))
-
-  -- this is the height distance between drawn txt1 and txt2
-  offset: f32 = 10
-
-  -- drawing player1 score
-  x1: f32 = self.*.width / 2 - bigger_txt_measure / 2
-  y1: f32 = self.*.height / 2 - cast(f32)font_size - offset
-  draw_text(txt1, cast(i32)x1, cast(i32)y1, font_size, get_lightgray())
-
-  -- drawing player2 score
-  x2: f32 = self.*.width / 2 - bigger_txt_measure / 2
-  y2: f32 = self.*.height / 2 + offset
-  draw_text(txt2, cast(i32)x2, cast(i32)y2, font_size, get_lightgray())
-
 fn update(self: *mut Game) -> void:
+  self.handle_keyboard_inputs()
+
+  if self.*.is_paused:
+    return
+  
   self.*.player1.mut.update_pad(self.*.height)
   self.*.player2.mut.update_pad(self.*.height)
 
   self.*.ball.mut.update_ball()
   self.handle_ball_collisions()
+
+fn handle_keyboard_inputs(self: *mut Game) -> void:
+  KeyPause: KeyboardKey = KeySpace
+  KeyHelp:  KeyboardKey = KeyH
+
+  if is_key_pressed(KeyPause):
+    self.toggle_pause_game()
+    
+  if is_key_pressed(KeyHelp):
+    self.toggle_help_message()
+
+fn toggle_pause_game(self: *mut Game) -> void:
+  self.*.is_paused = not self.*.is_paused
+
+fn toggle_help_message(self: *mut Game) -> void:
+  self.*.is_help = not self.*.is_help
 
 fn handle_ball_collisions(self: *mut Game) -> void:
   if self.is_ball_colliding_with_pads():
@@ -199,8 +173,11 @@ fn is_ball_colliding_with_left_side(self: *Game) -> u8:
 
 fn score_to_player(self: *mut Game, player: *mut Pad) -> void:
   player.*.score += 1
-  self.*.ball.pos = self.get_screen_center()
-  self.*.ball.vel = get_initial_ball_vel()
+  self.*.ball.mut.reset_ball(
+    self.*.width,
+    self.*.height,
+    self.*.difficulty
+  )
 
 fn get_screen_center(self: *Game) -> Vec2:
   return (

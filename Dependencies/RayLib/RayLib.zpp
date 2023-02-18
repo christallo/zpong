@@ -2,10 +2,12 @@ type Color = (r: u8, g: u8, b: u8, a: u8)
 type Vec2 = (x: f32, y: f32)
 type KeyboardKey = i32
 
-KeyS:    KeyboardKey =  83
-KeyW:    KeyboardKey =  87
-KeyDown: KeyboardKey = 264
-KeyUp:   KeyboardKey = 265
+KeySpace: KeyboardKey =  32
+KeyH:     KeyboardKey =  72
+KeyS:     KeyboardKey =  83
+KeyW:     KeyboardKey =  87
+KeyDown:  KeyboardKey = 264
+KeyUp:    KeyboardKey = 265
 
 fn get_black() -> Color:
   return (r: 0, g: 0, b: 0, a: 255)
@@ -18,6 +20,12 @@ fn get_yellow() -> Color:
 
 fn get_lightgray() -> Color:
   return (r: 200, g: 200, b: 200, a: 255)
+
+fn get_gold() -> Color:
+  return (r: 255, g: 203, b: 0, a: 255)
+
+fn get_gray() -> Color:
+  return (r: 130, g: 130, b: 130, a: 255)
 
 fn init_window(width: i32, height: i32, title: *u8) -> void:
   extern_call!(|void| 'lib/libraylib.a', 'InitWindow', width, height, title)
@@ -118,6 +126,15 @@ fn get_random_value(min: i32, max: i32) -> i32:
 
 fn get_monitor_refresh_rate(monitor: i32) -> i32:
   return extern_call!(|i32| 'lib/libraylib.a', 'GetMonitorRefreshRate', monitor)
+
+fn is_key_pressed(key: i32) -> u8:
+  return extern_call!(|u8| 'lib/libraylib.a', 'IsKeyPressed', key)
+
+fn is_key_released(key: i32) -> u8:
+  return extern_call!(|u8| 'lib/libraylib.a', 'IsKeyReleased', key)
+
+fn is_key_up(key: i32) -> u8:
+  return extern_call!(|u8| 'lib/libraylib.a', 'IsKeyUp', key)
 
 fn set_target_fps_to_max() -> void:
   set_target_fps(

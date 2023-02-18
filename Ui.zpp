@@ -1,0 +1,144 @@
+from 'Dependencies/RayLib/RayLib.zpp' import *
+from 'Game.zpp'                       import [ Game ]
+from 'System.Format'                  import [ format ]
+
+fn draw_sub_ui(self: *Game) -> void:
+  if self.*.is_help:
+    self.draw_help()
+    return
+
+  self.draw_score()
+
+fn draw_ui(self: *Game) -> void:
+  if self.*.cornice:
+    self.draw_cornice()
+
+  if self.*.log_fps:
+    draw_fps(0, 0)
+  
+  if self.*.is_paused:
+    self.draw_pause_alert()
+
+fn draw_pause_alert(self: *Game) -> void:
+  txt: *u8 = cstr!('Paused')
+  font_size: i32 = 40
+  color: Color = get_gray()
+
+  x: i32 = cast(i32)self.*.width / 2 - measure_text(txt, font_size) / 2
+  y: i32 = 30
+
+  draw_text(txt, x, y, font_size, color)
+
+fn draw_cornice(self: *Game) -> void:
+  w: f32 = self.*.width - 1
+  h: f32 = self.*.height - 1
+
+  thick: f32 = 2
+  color: Color = get_gray()
+
+  -- drawing the top cornice
+  draw_line_ex(
+    (x: 1, y: 1),
+    (x: w, y: 1),
+    thick,
+    color
+  )
+  -- drawing the left cornice
+  draw_line_ex(
+    (x: 1, y: 1),
+    (x: 1, y: h),
+    thick,
+    color
+  )
+  -- drawing the bottom cornice
+  draw_line_ex(
+    (x: 1, y: h),
+    (x: w, y: h),
+    thick,
+    color
+  )
+  -- drawing the right cornice
+  draw_line_ex(
+    (x: w, y: 1),
+    (x: w, y: h),
+    thick,
+    color
+  )
+
+fn draw_help(self: *Game) -> void:
+  font_size: i32 = 40
+
+  -- building the text for schemes
+  player1scheme: *u8 = format('{s}: {c}, {c}\0', args!(
+    self.*.player1.username,
+    cast(u8)self.*.player1.scheme.up_button,
+    cast(u8)self.*.player1.scheme.down_button
+  )).ptr
+  player2scheme: *u8 = format('{s}: {c}, {c}\0', args!(
+    self.*.player2.username,
+    cast(u8)self.*.player2.scheme.up_button,
+    cast(u8)self.*.player2.scheme.down_button
+  )).ptr
+
+  pause_scheme: *u8 = cstr!('pause: space')
+  help_scheme: *u8 = cstr!('help: h')
+
+  -- this is usefull to perfectly center-align the text to the screen
+  player1scheme_size: f32 = cast(f32)measure_text(player1scheme, font_size)
+  player2scheme_size: f32 = cast(f32)measure_text(player2scheme, font_size)
+  pause_scheme_size: f32 = cast(f32)measure_text(pause_scheme, font_size)
+  help_scheme_size: f32 = cast(f32)measure_text(help_scheme, font_size)
+
+  -- this is the height distance between texts
+  offset: f32 = 40 + cast(f32)font_size / 2
+  -- the color of the texts to draw
+  color: Color = get_gray()
+
+  x1: f32 = Undefined
+  y1: f32 = Undefined
+
+  -- drawing player1 scheme
+  x1 = self.*.width / 2 - player1scheme_size / 2
+  y1 = self.*.height / 2 - offset * 2
+  draw_text(player1scheme, cast(i32)x1, cast(i32)y1, font_size, color)
+
+  -- drawing player2 scheme
+  x1 = self.*.width / 2 - player2scheme_size / 2
+  y1 = self.*.height / 2 - offset * 1
+  draw_text(player2scheme, cast(i32)x1, cast(i32)y1, font_size, color)
+
+  -- drawing pause scheme
+  x1 = self.*.width / 2 - pause_scheme_size / 2
+  y1 = self.*.height / 2 - offset * -1
+  draw_text(pause_scheme, cast(i32)x1, cast(i32)y1, font_size, color)
+
+  -- drawing help scheme
+  x1 = self.*.width / 2 - help_scheme_size / 2
+  y1 = self.*.height / 2 - offset * -2
+  draw_text(help_scheme, cast(i32)x1, cast(i32)y1, font_size, color)
+
+fn draw_score(self: *Game) -> void:
+  font_size: i32 = 40
+
+  -- building the text score for player 1 and 2
+  txt1: *u8 = format('{s}: {u32}\0', args!(self.*.player1.username, self.*.player1.score)).ptr
+  txt2: *u8 = format('{s}: {u32}\0', args!(self.*.player2.username, self.*.player2.score)).ptr
+
+  -- this is usefull to perfectly center-align the text to the screen
+  txt1_size: f32 = cast(f32)measure_text(txt1, font_size)
+  txt2_size: f32 = cast(f32)measure_text(txt2, font_size)
+
+  -- this is the height distance between drawn txt1 and txt2
+  offset: f32 = 10
+  -- the color of the text to draw
+  color: Color = get_gray()
+
+  -- drawing player1 score
+  x1: f32 = self.*.width / 2 - txt1_size / 2
+  y1: f32 = self.*.height / 2 - cast(f32)font_size - offset
+  draw_text(txt1, cast(i32)x1, cast(i32)y1, font_size, color)
+
+  -- drawing player2 score
+  x2: f32 = self.*.width / 2 - txt2_size / 2
+  y2: f32 = self.*.height / 2 + offset
+  draw_text(txt2, cast(i32)x2, cast(i32)y2, font_size, color)
