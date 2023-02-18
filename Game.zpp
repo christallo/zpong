@@ -124,13 +124,13 @@ fn update(self: *mut Game) -> void:
   self.handle_ball_collisions()
 
 fn handle_keyboard_inputs(self: *mut Game) -> void:
-  KeyPause: KeyboardKey = KeySpace
-  KeyHelp:  KeyboardKey = KeyH
+  key_pause: KeyboardKey = KeySpace
+  key_help:  KeyboardKey = KeyH
 
-  if is_key_pressed(KeyPause):
+  if is_key_pressed(key_pause):
     self.toggle_pause_game()
     
-  if is_key_pressed(KeyHelp):
+  if is_key_pressed(key_help):
     self.toggle_help_message()
 
 fn toggle_pause_game(self: *mut Game) -> void:

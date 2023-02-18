@@ -69,15 +69,15 @@ fn draw_help(self: *Game) -> void:
   font_size: i32 = 40
 
   -- building the text for schemes
-  player1scheme: *u8 = format('{s}: {c}, {c}\0', args!(
+  player1scheme: *u8 = format('{s}: {s}, {s}\0', args!(
     self.*.player1.username,
-    cast(u8)self.*.player1.scheme.up_button,
-    cast(u8)self.*.player1.scheme.down_button
+    self.*.player1.scheme.up_button.key_to_string(),
+    self.*.player1.scheme.down_button.key_to_string()
   )).ptr
-  player2scheme: *u8 = format('{s}: {c}, {c}\0', args!(
+  player2scheme: *u8 = format('{s}: {s}, {s}\0', args!(
     self.*.player2.username,
-    cast(u8)self.*.player2.scheme.up_button,
-    cast(u8)self.*.player2.scheme.down_button
+    self.*.player2.scheme.up_button.key_to_string(),
+    self.*.player2.scheme.down_button.key_to_string()
   )).ptr
 
   pause_scheme: *u8 = cstr!('pause: space')
@@ -97,24 +97,28 @@ fn draw_help(self: *Game) -> void:
   x1: f32 = Undefined
   y1: f32 = Undefined
 
+  -- screen center
+  w: f32 = self.*.width / 2
+  h: f32 = self.*.height / 2
+
   -- drawing player1 scheme
-  x1 = self.*.width / 2 - player1scheme_size / 2
-  y1 = self.*.height / 2 - offset * 2
+  x1 = w - player1scheme_size / 2
+  y1 = h - offset * +2
   draw_text(player1scheme, cast(i32)x1, cast(i32)y1, font_size, color)
 
   -- drawing player2 scheme
-  x1 = self.*.width / 2 - player2scheme_size / 2
-  y1 = self.*.height / 2 - offset * 1
+  x1 = w - player2scheme_size / 2
+  y1 = h - offset * +1
   draw_text(player2scheme, cast(i32)x1, cast(i32)y1, font_size, color)
 
   -- drawing pause scheme
-  x1 = self.*.width / 2 - pause_scheme_size / 2
-  y1 = self.*.height / 2 - offset * -1
+  x1 = w - pause_scheme_size / 2
+  y1 = h - offset * -1
   draw_text(pause_scheme, cast(i32)x1, cast(i32)y1, font_size, color)
 
   -- drawing help scheme
-  x1 = self.*.width / 2 - help_scheme_size / 2
-  y1 = self.*.height / 2 - offset * -2
+  x1 = w - help_scheme_size / 2
+  y1 = h - offset * -2
   draw_text(help_scheme, cast(i32)x1, cast(i32)y1, font_size, color)
 
 fn draw_score(self: *Game) -> void:

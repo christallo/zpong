@@ -1,13 +1,123 @@
+from 'System.String' import [ String ]
+
 type Color = (r: u8, g: u8, b: u8, a: u8)
 type Vec2 = (x: f32, y: f32)
 type KeyboardKey = i32
 
-KeySpace: KeyboardKey =  32
-KeyH:     KeyboardKey =  72
-KeyS:     KeyboardKey =  83
-KeyW:     KeyboardKey =  87
-KeyDown:  KeyboardKey = 264
-KeyUp:    KeyboardKey = 265
+KeyNull:             KeyboardKey =   0
+-- Alphanumeric keys
+KeyApostrophe:       KeyboardKey =  39
+KeyComma:            KeyboardKey =  44
+KeyMinus:            KeyboardKey =  45
+KeyPeriod:           KeyboardKey =  46
+KeySlash:            KeyboardKey =  47
+KeyZero:             KeyboardKey =  48
+KeyOne:              KeyboardKey =  49
+KeyTwo:              KeyboardKey =  50
+KeyThree:            KeyboardKey =  51
+KeyFour:             KeyboardKey =  52
+KeyFive:             KeyboardKey =  53
+KeySix:              KeyboardKey =  54
+KeySeven:            KeyboardKey =  55
+KeyEight:            KeyboardKey =  56
+KeyNine:             KeyboardKey =  57
+KeySemicolon:        KeyboardKey =  59
+KeyEqual:            KeyboardKey =  61
+KeyA:                KeyboardKey =  65
+KeyB:                KeyboardKey =  66
+KeyC:                KeyboardKey =  67
+KeyD:                KeyboardKey =  68
+KeyE:                KeyboardKey =  69
+KeyF:                KeyboardKey =  70
+KeyG:                KeyboardKey =  71
+KeyH:                KeyboardKey =  72
+KeyI:                KeyboardKey =  73
+KeyJ:                KeyboardKey =  74
+KeyK:                KeyboardKey =  75
+KeyL:                KeyboardKey =  76
+KeyM:                KeyboardKey =  77
+KeyN:                KeyboardKey =  78
+KeyO:                KeyboardKey =  79
+KeyP:                KeyboardKey =  80
+KeyQ:                KeyboardKey =  81
+KeyR:                KeyboardKey =  82
+KeyS:                KeyboardKey =  83
+KeyT:                KeyboardKey =  84
+KeyU:                KeyboardKey =  85
+KeyV:                KeyboardKey =  86
+KeyW:                KeyboardKey =  87
+KeyX:                KeyboardKey =  88
+KeyY:                KeyboardKey =  89
+KeyZ:                KeyboardKey =  90
+KeyLeftBracket:      KeyboardKey =  91
+KeyBackslash:        KeyboardKey =  92
+KeyRightBracket:     KeyboardKey =  93
+KeyGrave:            KeyboardKey =  96
+-- Function keys
+KeySpace:            KeyboardKey =  32
+KeyEscape:           KeyboardKey = 256
+KeyEnter:            KeyboardKey = 257
+KeyTab:              KeyboardKey = 258
+KeyBackspace:        KeyboardKey = 259
+KeyInsert:           KeyboardKey = 260
+KeyDelete:           KeyboardKey = 261
+KeyRight:            KeyboardKey = 262
+KeyLeft:             KeyboardKey = 263
+KeyDown:             KeyboardKey = 264
+KeyUp:               KeyboardKey = 265
+KeyPageUp:           KeyboardKey = 266
+KeyPageDown:         KeyboardKey = 267
+KeyHome:             KeyboardKey = 268
+KeyEnd:              KeyboardKey = 269
+KeyCapsLock:         KeyboardKey = 280
+KeyScrollLock:       KeyboardKey = 281
+KeyNumLock:          KeyboardKey = 282
+KeyPrintScreen:      KeyboardKey = 283
+KeyPause:            KeyboardKey = 284
+KeyF1:               KeyboardKey = 290
+KeyF2:               KeyboardKey = 291
+KeyF3:               KeyboardKey = 292
+KeyF4:               KeyboardKey = 293
+KeyF5:               KeyboardKey = 294
+KeyF6:               KeyboardKey = 295
+KeyF7:               KeyboardKey = 296
+KeyF8:               KeyboardKey = 297
+KeyF9:               KeyboardKey = 298
+KeyF10:              KeyboardKey = 299
+KeyF11:              KeyboardKey = 300
+KeyF12:              KeyboardKey = 301
+KeyLeftShift:        KeyboardKey = 340
+KeyLeftControl:      KeyboardKey = 341
+KeyLeftAlt:          KeyboardKey = 342
+KeyLeftSuper:        KeyboardKey = 343
+KeyRightShift:       KeyboardKey = 344
+KeyRightControl:     KeyboardKey = 345
+KeyRightAlt:         KeyboardKey = 346
+KeyRightSuper:       KeyboardKey = 347
+KeyKbMenu:           KeyboardKey = 348
+-- Keypad keys
+KeyKp0:              KeyboardKey = 320
+KeyKp1:              KeyboardKey = 321
+KeyKp2:              KeyboardKey = 322
+KeyKp3:              KeyboardKey = 323
+KeyKp4:              KeyboardKey = 324
+KeyKp5:              KeyboardKey = 325
+KeyKp6:              KeyboardKey = 326
+KeyKp7:              KeyboardKey = 327
+KeyKp8:              KeyboardKey = 328
+KeyKp9:              KeyboardKey = 329
+KeyKpDecimal:        KeyboardKey = 330
+KeyKpDivide:         KeyboardKey = 331
+KeyKpMultiply:       KeyboardKey = 332
+KeyKpSubtract:       KeyboardKey = 333
+KeyKpAdd:            KeyboardKey = 334
+KeyKpEnter:          KeyboardKey = 335
+KeyKpEqual:          KeyboardKey = 336
+-- Android key
+KeyBack:             KeyboardKey =   4
+KeyMenu:             KeyboardKey =  82
+KeyVolumeUp:         KeyboardKey =  24
+KeyVolumeDown:       KeyboardKey =  25
 
 fn get_black() -> Color:
   return (r: 0, g: 0, b: 0, a: 255)
@@ -140,3 +250,228 @@ fn set_target_fps_to_max() -> void:
   set_target_fps(
     get_monitor_refresh_rate(get_current_monitor())
   )
+
+fn key_to_string(key: KeyboardKey) -> String:
+  match key:
+    case KeyNull:
+      return 'null'
+    case KeyApostrophe:
+      return 'apex'
+    case KeyComma:
+      return 'comma'
+    case KeyMinus:
+      return 'minus'
+    case KeyPeriod:
+      return 'period'
+    case KeySlash:
+      return 'slash'
+    case KeyZero:
+      return '0'
+    case KeyOne:
+      return '1'
+    case KeyTwo:
+      return '2'
+    case KeyThree:
+      return '3'
+    case KeyFour:
+      return '4'
+    case KeyFive:
+      return '5'
+    case KeySix:
+      return '6'
+    case KeySeven:
+      return '7'
+    case KeyEight:
+      return '8'
+    case KeyNine:
+      return '9'
+    case KeySemicolon:
+      return 'semicolon'
+    case KeyEqual:
+      return '='
+    case KeyA:
+      return 'a'
+    case KeyB:
+      return 'b'
+    case KeyC:
+      return 'c'
+    case KeyD:
+      return 'd'
+    case KeyE:
+      return 'e'
+    case KeyF:
+      return 'f'
+    case KeyG:
+      return 'g'
+    case KeyH:
+      return 'h'
+    case KeyI:
+      return 'i'
+    case KeyJ:
+      return 'j'
+    case KeyK:
+      return 'k'
+    case KeyL:
+      return 'l'
+    case KeyM:
+      return 'm'
+    case KeyN:
+      return 'n'
+    case KeyO:
+      return 'o'
+    case KeyP:
+      return 'p'
+    case KeyQ:
+      return 'q'
+    case KeyR:
+      return 'r'
+    case KeyS:
+      return 's'
+    case KeyT:
+      return 't'
+    case KeyU:
+      return 'u'
+    case KeyV:
+      return 'v'
+    case KeyW:
+      return 'w'
+    case KeyX:
+      return 'x'
+    case KeyY:
+      return 'y'
+    case KeyZ:
+      return 'z'
+    case KeyLeftBracket:
+      return 'left_bracket'
+    case KeyBackslash:
+      return 'backslash'
+    case KeyRightBracket:
+      return 'right_bracket'
+    case KeyGrave:
+      return 'backtick'
+    case KeySpace:
+      return 'space'
+    case KeyEscape:
+      return 'escape'
+    case KeyEnter:
+      return 'enter'
+    case KeyTab:
+      return 'tab'
+    case KeyBackspace:
+      return 'backspace'
+    case KeyInsert:
+      return 'insert'
+    case KeyDelete:
+      return 'delete'
+    case KeyRight:
+      return 'right'
+    case KeyLeft:
+      return 'left'
+    case KeyDown:
+      return 'down'
+    case KeyUp:
+      return 'up'
+    case KeyPageUp:
+      return 'page_up'
+    case KeyPageDown:
+      return 'page_down'
+    case KeyHome:
+      return 'home'
+    case KeyEnd:
+      return 'end'
+    case KeyCapsLock:
+      return 'caps_lock'
+    case KeyScrollLock:
+      return 'scroll_lock'
+    case KeyNumLock:
+      return 'num_lock'
+    case KeyPrintScreen:
+      return 'print_screen'
+    case KeyPause:
+      return 'pause'
+    case KeyF1:
+      return 'f1'
+    case KeyF2:
+      return 'f2'
+    case KeyF3:
+      return 'f3'
+    case KeyF4:
+      return 'f4'
+    case KeyF5:
+      return 'f5'
+    case KeyF6:
+      return 'f6'
+    case KeyF7:
+      return 'f7'
+    case KeyF8:
+      return 'f8'
+    case KeyF9:
+      return 'f9'
+    case KeyF10:
+      return 'f10'
+    case KeyF11:
+      return 'f11'
+    case KeyF12:
+      return 'f12'
+    case KeyLeftShift:
+      return 'left_shift'
+    case KeyLeftControl:
+      return 'left_control'
+    case KeyLeftAlt:
+      return 'left_alt'
+    case KeyLeftSuper:
+      return 'left_super'
+    case KeyRightShift:
+      return 'right_shift'
+    case KeyRightControl:
+      return 'right_control'
+    case KeyRightAlt:
+      return 'right_alt'
+    case KeyRightSuper:
+      return 'right_super'
+    case KeyKbMenu:
+      return 'kb_menu'
+    case KeyKp0:
+      return 'kp0'
+    case KeyKp1:
+      return 'kp1'
+    case KeyKp2:
+      return 'kp2'
+    case KeyKp3:
+      return 'kp3'
+    case KeyKp4:
+      return 'kp4'
+    case KeyKp5:
+      return 'kp5'
+    case KeyKp6:
+      return 'kp6'
+    case KeyKp7:
+      return 'kp7'
+    case KeyKp8:
+      return 'kp8'
+    case KeyKp9:
+      return 'kp9'
+    case KeyKpDecimal:
+      return 'kp_decimal'
+    case KeyKpDivide:
+      return 'kp_divide'
+    case KeyKpMultiply:
+      return 'kp_multiply'
+    case KeyKpSubtract:
+      return 'kp_subtract'
+    case KeyKpAdd:
+      return 'kp_add'
+    case KeyKpEnter:
+      return 'kp_enter'
+    case KeyKpEqual:
+      return 'kp_equal'
+    case KeyBack:
+      return 'back'
+    case KeyMenu:
+      return 'menu'
+    case KeyVolumeUp:
+      return 'volume_up'
+    case KeyVolumeDown:
+      return 'volume_down'
+    else:
+      return '<?>'
