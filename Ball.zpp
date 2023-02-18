@@ -1,23 +1,26 @@
+from 'Misc.zpp'                       import [ Rect, point_is_inside_rectangle ]
 from 'Game.zpp'                       import [ DifficultyLevel ]
 from 'Pad.zpp'                        import [ Pad ]
 from 'Dependencies/RayLib/RayLib.zpp' import *
 
 type Ball = (
   pos: Vec2,
-  vel: Vec2
+  vel: Vec2,
+  size: f32
 )
 
-fn create_centered(width: f32, height: f32, difficulty: DifficultyLevel) -> Ball:
+fn create_centered(width: f32, height: f32, difficulty: DifficultyLevel, size: f32) -> Ball:
   return (
     pos: (x: width / 2, y: height / 2),
-    vel: get_initial_ball_vel(difficulty)
+    vel: get_initial_ball_vel(difficulty),
+    size: size
   )
 
 fn drop(self: *mut Ball) -> void:
   pass
 
 fn reset_ball(self: *mut Ball, width: f32, height: f32, difficulty: DifficultyLevel) -> void:
-  *self = create_centered(width, height, difficulty)
+  *self = create_centered(width, height, difficulty, self.*.size)
 
 fn get_initial_ball_vel(difficulty: DifficultyLevel) -> Vec2:
   direction_table: [2 x f32] = [-1, 1]
@@ -27,12 +30,15 @@ fn get_initial_ball_vel(difficulty: DifficultyLevel) -> Vec2:
     (x: 600, y: 200)
   ]
 
+  -- i randomize the intiatial direction (left or right)
   x_direction: f32 = direction_table[get_random_value(0, 1)]
   y_direction: f32 = direction_table[get_random_value(0, 1)]
 
+  -- getting the speedness of the ball based on the difficulty
   x_difficulty: f32 = difficulty_table[difficulty].x
   y_difficulty: f32 = difficulty_table[difficulty].y
 
+  -- combining the speedness and the direction
   return (x: x_direction * x_difficulty, y: y_direction * y_difficulty)
 
 fn update(self: *mut Ball) -> void:
@@ -46,22 +52,28 @@ fn is_ball_colliding_with_pad(self: *Ball, pad: *Pad) -> u8:
   )
 
 fn is_ball_colliding_with_pad_on_x(self: *Ball, pad: *Pad) -> u8:
+  a: f32 = self.*.pos.x
+  b: f32 = self.*.pos.x + self.*.size
+
   return (
-    self.*.pos.x >= pad.*.pos.x and
-    self.*.pos.x <= pad.*.pos.x + pad.*.size.x
+    b >= pad.*.pos.x and
+    a <= pad.*.pos.x + pad.*.size.x
   )
 
 fn is_ball_colliding_with_pad_on_y(self: *Ball, pad: *Pad) -> u8:
+  a: f32 = self.*.pos.y
+  b: f32 = self.*.pos.y + self.*.size
+
   return (
-    self.*.pos.y >= pad.*.pos.y - pad.*.size.y / 2 and
-    self.*.pos.y <= pad.*.pos.y + pad.*.size.y / 2
+    b >= pad.*.pos.y - pad.*.size.y / 2 and
+    a <= pad.*.pos.y + pad.*.size.y / 2
   )
 
 fn draw(self: *Ball) -> void:
   draw_rectangle(
     cast(i32)self.*.pos.x - 5,
     cast(i32)self.*.pos.y - 5,
-    10,
-    10,
+    cast(i32)self.*.size,
+    cast(i32)self.*.size,
     get_gold()
   )

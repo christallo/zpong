@@ -55,6 +55,7 @@ fn create(
   height: f32 = cast(f32)get_screen_height()
   pad_size: Vec2 = (x: 10, y: 100)
   pad_movement_speed: f32 = 400
+  ball_size: f32 = 20
 
   return (
     player1: create_pad(
@@ -71,7 +72,7 @@ fn create(
       (x: width - 20 - pad_size.x, y: height / 2),
       pad_size
     ),
-    ball: create_centered_ball(width, height, difficulty),
+    ball: create_centered_ball(width, height, difficulty, ball_size),
     width: width,
     height: height,
     scheme: (pause_button: KeySpace, help_button: KeyH),
@@ -143,7 +144,7 @@ fn handle_ball_collisions(self: *mut Game) -> void:
   if self.is_ball_colliding_with_pads():
     self.*.ball.vel.x *= -1
   
-  if self.is_ball_colliding_with_edges():
+  if self.is_ball_colliding_with_top_or_bottom():
     self.*.ball.vel.y *= -1
 
   if self.is_ball_colliding_with_right_side():
@@ -158,15 +159,14 @@ fn is_ball_colliding_with_pads(self: *Game) -> u8:
     self.*.ball.ref.is_ball_colliding_with_pad(ref self.*.player2)
   )
 
--- checks whether the ball is colliding with the top or bottom
-fn is_ball_colliding_with_edges(self: *Game) -> u8:
+fn is_ball_colliding_with_top_or_bottom(self: *Game) -> u8:
   return (
-    self.*.ball.pos.y >= self.*.height or
+    self.*.ball.pos.y + self.*.ball.size >= self.*.height or
     self.*.ball.pos.y <= 0
   )
 
 fn is_ball_colliding_with_right_side(self: *Game) -> u8:
-  return self.*.ball.pos.x >= self.*.width
+  return self.*.ball.pos.x + self.*.ball.size >= self.*.width
 
 fn is_ball_colliding_with_left_side(self: *Game) -> u8:
   return self.*.ball.pos.x <= 0

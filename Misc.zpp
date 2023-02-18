@@ -1,0 +1,24 @@
+from 'Dependencies/RayLib/RayLib.zpp' import [ Vec2 ]
+
+type Rect = (pos: Vec2, size: Vec2)
+
+fn point_is_inside_rectangle(point_pos: Vec2, rect: *Rect) -> u8:
+  return (
+    point_pos.x >= rect.*.pos.x and point_pos.x <= rect.*.pos.x + rect.*.size.x and
+    point_pos.y >= rect.*.pos.y and point_pos.y <= rect.*.pos.y + rect.*.size.y
+  )
+
+test 'point is inside rectangle':
+  try expect!(
+    (x: 2, y: 3).point_is_inside_rectangle(ref (
+      pos: (x: 0, y: 0),
+      size: (x: 3, y: 3)
+    ))
+  )
+
+  try expect!(
+    not (x: 5, y: 3).point_is_inside_rectangle(ref (
+      pos: (x: 0, y: 0),
+      size: (x: 3, y: 3)
+    ))
+  )

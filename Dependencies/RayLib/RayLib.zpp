@@ -1,4 +1,5 @@
 from 'System.String' import [ String ]
+from 'System.Format' import [ format ]
 
 type Color = (r: u8, g: u8, b: u8, a: u8)
 type Vec2 = (x: f32, y: f32)
@@ -475,3 +476,13 @@ fn key_to_string(key: KeyboardKey) -> String:
       return 'volume_down'
     else:
       return '<?>'
+
+-- todo: use `{f32}` instead of `i32` when available
+fn vec2_to_string(vec: Vec2) -> String:
+  return format(
+    'Vec2(x: {i32}, y: {i32})',
+    args!(
+      cast(i32)vec.x,
+      cast(i32)vec.y
+    )
+  )
