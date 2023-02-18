@@ -29,12 +29,14 @@ DifficultyEasy:   DifficultyLevel = 0
 DifficultyMedium: DifficultyLevel = 1
 DifficultyHard:   DifficultyLevel = 2
 
+type InputScheme = (pause_button: KeyboardKey, help_button: KeyboardKey)
 type Game = (
   player1: Pad,
   player2: Pad,
   ball: Ball,
   width: f32,
   height: f32,
+  scheme: InputScheme,
   difficulty: DifficultyLevel,
   is_paused: u8,
   is_help: u8,
@@ -72,6 +74,7 @@ fn create(
     ball: create_centered_ball(width, height, difficulty),
     width: width,
     height: height,
+    scheme: (pause_button: KeySpace, help_button: KeyH),
     difficulty: difficulty,
     is_paused: False,
     is_help: False,

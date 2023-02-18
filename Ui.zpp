@@ -69,19 +69,23 @@ fn draw_help(self: *Game) -> void:
   font_size: i32 = 40
 
   -- building the text for schemes
-  player1scheme: *u8 = format('{s}: {s}, {s}\0', args!(
+  player1scheme: *u8 = format('{s}: {s}-{s}\0', args!(
     self.*.player1.username,
     self.*.player1.scheme.up_button.key_to_string(),
     self.*.player1.scheme.down_button.key_to_string()
   )).ptr
-  player2scheme: *u8 = format('{s}: {s}, {s}\0', args!(
+  player2scheme: *u8 = format('{s}: {s}-{s}\0', args!(
     self.*.player2.username,
     self.*.player2.scheme.up_button.key_to_string(),
     self.*.player2.scheme.down_button.key_to_string()
   )).ptr
 
-  pause_scheme: *u8 = cstr!('pause: space')
-  help_scheme: *u8 = cstr!('help: h')
+  pause_scheme: *u8 = format('pause: {s}\0', args!(
+    self.*.scheme.pause_button.key_to_string()
+  )).ptr
+  help_scheme: *u8 = format('help: {s}\0', args!(
+    self.*.scheme.help_button.key_to_string()
+  )).ptr
 
   -- this is usefull to perfectly center-align the text to the screen
   player1scheme_size: f32 = cast(f32)measure_text(player1scheme, font_size)
