@@ -1,6 +1,58 @@
 from 'System.String' import [ String ]
 from 'System.Format' import [ format ]
 
+type TraceLogLevel = i32
+
+LogAll:     TraceLogLevel = 0
+LogTrace:   TraceLogLevel = 1
+LogDebug:   TraceLogLevel = 2
+LogInfo:    TraceLogLevel = 3
+LogWarning: TraceLogLevel = 4
+LogError:   TraceLogLevel = 5
+LogFatal:   TraceLogLevel = 6
+LogNone:    TraceLogLevel = 7
+
+type Rectangle = (
+  x: f32,
+  y: f32,
+  width: f32,
+  height: f32
+)
+
+type Texture2D = Texture
+type Texture = (
+  id: u32,
+  width: i32,
+  height: i32,
+  mipmaps: i32,
+  format: i32
+)
+
+type Image = (
+  data: *u8,
+  width: i32,
+  height: i32,
+  mipmaps: i32,
+  format: i32
+)
+
+type GlyphInfo = (
+  value: i32,
+  offset_x: i32,
+  offset_y: i32,
+  advance_x: i32,
+  image: Image
+)
+
+type Font = (
+  base_size: i32,
+  glyph_count: i32,
+  glyph_padding: i32,
+  texture: Texture2D,
+  recs: *Rectangle,
+  glyphs: *GlyphInfo
+)
+
 type Color = (r: u8, g: u8, b: u8, a: u8)
 type Vec2 = (x: f32, y: f32)
 type KeyboardKey = i32
@@ -171,6 +223,9 @@ fn toggle_fullscreen() -> void:
 fn draw_text(text: *u8, x: i32, y: i32, font_size: i32, color: Color) -> void:
   extern_call!(|void| 'lib/libraylib.a', 'DrawText', text, x, y, font_size, color.into!(|i32|))
 
+fn draw_text_ex(font: Font, text: *u8, pos: Vec2, font_size: f32, spacing: f32, color: Color) -> void:
+  extern_call!(|void| 'lib/libraylib.a', 'DrawTextEx', font, text, pos, font_size, spacing, color)
+
 fn draw_line_ex(start: Vec2, stop: Vec2, thick: f32, color: Color) -> void:
   extern_call!(|void|
     'lib/libraylib.a',
@@ -180,6 +235,9 @@ fn draw_line_ex(start: Vec2, stop: Vec2, thick: f32, color: Color) -> void:
     thick,
     color.into!(|i32|)
   )
+
+fn load_font(filename: *u8) -> Font:
+  return extern_call!(|Font| 'lib/libraylib.a', 'LoadFont', filename)
 
 fn draw_line(start_x: i32, start_y: i32, stop_x: i32, stop_y: i32, color: Color) -> void:
   extern_call!(|void| 'lib/libraylib.a', 'DrawLine', start_x, start_y, stop_x, stop_y, color.into!(|i32|))
@@ -207,6 +265,9 @@ fn get_current_monitor() -> i32:
 
 fn is_key_down(key: KeyboardKey) -> u8:
   return extern_call!(|u8| 'lib/libraylib.a', 'IsKeyDown', key)
+
+fn set_trace_log_level(level: TraceLogLevel) -> void:
+  extern_call!(|void| 'lib/libraylib.a', 'SetTraceLogLevel', level)
 
 fn draw_rectangle_v(pos: Vec2, size: Vec2, color: Color) -> void:
   extern_call!(|void|

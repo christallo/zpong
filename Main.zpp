@@ -1,8 +1,10 @@
 from 'Dependencies/RayLib/RayLib.zpp' import [
+  LogNone,
   init_window,
   close_window,
   toggle_fullscreen,
-  set_target_fps_to_max
+  set_target_fps_to_max,
+  set_trace_log_level
 ]
 
 from 'Game.zpp' import [
@@ -51,6 +53,9 @@ fn main(argc: u32, argv: **u8) -> Result:
   defer unparsed_difficulty.mut.drop_string()
 
   difficulty: DifficultyLevel = unparsed_difficulty.ref.parse_difficulty()
+
+  if is_release_build!():
+    set_trace_log_level(LogNone)
 
   init_window(0, 0, cstr!('PongGame'))
   toggle_fullscreen()

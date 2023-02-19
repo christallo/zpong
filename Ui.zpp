@@ -14,7 +14,7 @@ fn draw_ui(self: *Game) -> void:
     self.draw_cornice()
 
   if self.*.log_fps:
-    draw_fps(0, 0)
+    draw_fps(10, 10)
   
   if self.*.is_paused:
     self.draw_pause_alert()
